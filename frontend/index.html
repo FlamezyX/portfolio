@@ -218,8 +218,7 @@
           ${p.tags.map(t => `<span class="chip">${t}</span>`).join('')}
         </div>
         <div class="project-links">
-          ${p.reportUrl ? `<a href="${p.reportUrl}" target="_blank" rel="noopener">↗ View report</a>` : ''}
-          ${p.sqlUrl ? `<a href="${p.sqlUrl}" target="_blank" rel="noopener">↗ SQL file</a>` : ''}
+          ${(p.links || []).map(l => `<a href="${l.url}" target="_blank" rel="noopener">↗ ${l.label}</a>`).join('')}
         </div>
       </div>
     `).join('');

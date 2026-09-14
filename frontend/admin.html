@@ -401,9 +401,12 @@
           <div class="field"><label>Title</label><input type="text" id="proj-title"></div>
           <div class="field"><label>Description</label><textarea id="proj-desc"></textarea></div>
           <div class="field"><label>Tags (comma separated)</label><input type="text" id="proj-tags"></div>
-          <div class="field"><label>Report URL</label><input type="text" id="proj-report"></div>
-          <div class="field"><label>SQL file URL</label><input type="text" id="proj-sql"></div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div class="field">
+            <label>Project links</label>
+            <div id="proj-links-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
+            <button class="btn btn-ghost" type="button" onclick="addLinkRow()" style="font-size:0.82rem;padding:7px 14px;">+ Add link</button>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
             <button class="btn btn-green" onclick="saveProject()">Save project</button>
             <button class="btn btn-ghost" onclick="clearProjectForm()">Clear</button>
           </div>
@@ -620,14 +623,33 @@
     if (res) { showToast('Links saved ✓'); await loadData(); }
   }
 
+  function addLinkRow(label = '', url = '') {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;align-items:center;';
+    row.innerHTML = `
+      <input type="text" placeholder="Label (e.g. SQL file, Excel, Power BI)" value="${label}"
+        style="flex:1;background:var(--bg-3);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-family:Inter,sans-serif;font-size:0.88rem;">
+      <input type="text" placeholder="URL" value="${url}"
+        style="flex:2;background:var(--bg-3);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-family:Inter,sans-serif;font-size:0.88rem;">
+      <button type="button" onclick="this.parentElement.remove()" style="background:var(--accent-red);border:none;border-radius:8px;color:#fff;padding:8px 10px;cursor:pointer;font-size:0.85rem;">✕</button>
+    `;
+    document.getElementById('proj-links-list').appendChild(row);
+  }
+
+  function getProjectLinks() {
+    return [...document.getElementById('proj-links-list').children].map(row => {
+      const [labelInput, urlInput] = row.querySelectorAll('input');
+      return { label: labelInput.value.trim(), url: urlInput.value.trim() };
+    }).filter(l => l.label && l.url);
+  }
+
   async function saveProject() {
     const id = document.getElementById('edit-project-id').value;
     const body = {
       title: document.getElementById('proj-title').value,
       description: document.getElementById('proj-desc').value,
       tags: document.getElementById('proj-tags').value.split(',').map(t => t.trim()).filter(Boolean),
-      reportUrl: document.getElementById('proj-report').value,
-      sqlUrl: document.getElementById('proj-sql').value,
+      links: getProjectLinks(),
     };
     if (!body.title) return showToast('Title is required', true);
     const res = id ? await authFetch(`/projects/${id}`, 'PUT', body) : await authFetch('/projects', 'POST', body);
@@ -639,8 +661,8 @@
     document.getElementById('proj-title').value = p.title;
     document.getElementById('proj-desc').value = p.description;
     document.getElementById('proj-tags').value = p.tags.join(', ');
-    document.getElementById('proj-report').value = p.reportUrl || '';
-    document.getElementById('proj-sql').value = p.sqlUrl || '';
+    document.getElementById('proj-links-list').innerHTML = '';
+    (p.links || []).forEach(l => addLinkRow(l.label, l.url));
     document.getElementById('project-form-title').textContent = 'Edit project';
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   }
@@ -652,8 +674,8 @@
   }
 
   function clearProjectForm() {
-    ['edit-project-id','proj-title','proj-desc','proj-tags','proj-report','proj-sql']
-      .forEach(id => document.getElementById(id).value = '');
+    ['edit-project-id','proj-title','proj-desc','proj-tags'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('proj-links-list').innerHTML = '';
     document.getElementById('project-form-title').textContent = 'Add new project';
   }
 
