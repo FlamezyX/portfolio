@@ -27,6 +27,15 @@ if (!fs.existsSync(DATA_FILE)) {
     projects: []
   }, null, 2));
 }
+
+// Seed admin from env vars if admin is null (survives redeployments)
+{
+  const d = readData();
+  if (!d.admin && process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD_HASH) {
+    d.admin = { username: process.env.ADMIN_USERNAME, password: process.env.ADMIN_PASSWORD_HASH };
+    writeData(d);
+  }
+}
 const readData = () => JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
 const writeData = (data) => fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 
