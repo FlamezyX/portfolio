@@ -27,6 +27,8 @@ if (!fs.existsSync(DATA_FILE)) {
     projects: []
   }, null, 2));
 }
+const readData = () => JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+const writeData = (data) => fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 
 // Seed admin from env vars if admin is null (survives redeployments)
 {
@@ -36,8 +38,6 @@ if (!fs.existsSync(DATA_FILE)) {
     writeData(d);
   }
 }
-const readData = () => JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
-const writeData = (data) => fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 
 // ── multer (photo upload) ──
 const storage = multer.diskStorage({
