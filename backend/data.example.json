@@ -1,0 +1,16 @@
+{
+  "admin": null,
+  "profile": {
+    "name": "Your Name",
+    "title": "Data Analyst",
+    "bio": "Your bio here.",
+    "photo": ""
+  },
+  "links": {
+    "email": "",
+    "whatsapp": "",
+    "github": "",
+    "linkedin": ""
+  },
+  "projects": []
+}
