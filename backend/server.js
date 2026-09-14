@@ -140,6 +140,17 @@ app.put('/projects/:id', auth, (req, res) => {
   res.json(data.projects[index]);
 });
 
+// POST /change-password
+app.post('/change-password', auth, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const data = readData();
+  const valid = await bcrypt.compare(currentPassword, data.admin.password);
+  if (!valid) return res.status(401).json({ error: 'Current password is incorrect' });
+  data.admin.password = await bcrypt.hash(newPassword, 10);
+  writeData(data);
+  res.json({ success: true });
+});
+
 // DELETE /projects/:id — remove a project
 app.delete('/projects/:id', auth, (req, res) => {
   const data = readData();

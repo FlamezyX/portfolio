@@ -6,7 +6,7 @@
 <title>Admin — Benjamin Emmanuel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg: #0D1117;
@@ -19,187 +19,196 @@
     --accent-green: #3FB950;
     --accent-red: #F85149;
     --accent-orange: #F0883E;
+    --accent-purple: #BC8CFF;
+    --sidebar-w: 260px;
   }
   *{ box-sizing: border-box; margin: 0; padding: 0; }
   body{ background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; }
   a{ color: inherit; text-decoration: none; }
 
   /* ── login ── */
-  .login-screen{
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .login-box{
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 40px;
-    width: 100%;
-    max-width: 380px;
-  }
-  .login-box h1{ font-size: 1.4rem; margin-bottom: 6px; }
+  .login-screen{ min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at 60% 40%, #1a2744 0%, var(--bg) 70%); }
+  .login-box{ background: var(--bg-2); border: 1px solid var(--border); border-radius: 20px; padding: 44px; width: 100%; max-width: 400px; box-shadow: 0 24px 64px rgba(0,0,0,.5); }
+  .login-logo{ font-size: 1.5rem; font-weight: 700; margin-bottom: 28px; }
+  .login-logo span{ color: var(--accent); }
+  .login-box h1{ font-size: 1.3rem; margin-bottom: 6px; }
   .login-box p{ color: var(--text-soft); font-size: 0.9rem; margin-bottom: 28px; }
 
   /* ── form elements ── */
   .field{ margin-bottom: 16px; }
-  .field label{ display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-soft); margin-bottom: 6px; }
+  .field label{ display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-soft); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
   .field input, .field textarea{
-    width: 100%;
-    background: var(--bg-3);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.92rem;
-    transition: border-color .15s;
+    width: 100%; background: var(--bg-3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 11px 14px; color: var(--text);
+    font-family: 'Inter', sans-serif; font-size: 0.92rem; transition: border-color .15s;
   }
-  .field input:focus, .field textarea:focus{ outline: none; border-color: var(--accent); }
+  .field input:focus, .field textarea:focus{ outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88,166,255,.1); }
   .field textarea{ resize: vertical; min-height: 90px; }
 
   /* ── buttons ── */
   .btn{
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: opacity .15s;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 18px; border-radius: 10px; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; border: none; transition: opacity .15s, transform .1s;
   }
-  .btn:hover{ opacity: .85; }
+  .btn:hover{ opacity: .85; transform: translateY(-1px); }
+  .btn:active{ transform: translateY(0); }
   .btn-primary{ background: var(--accent); color: #0D1117; }
   .btn-green{ background: var(--accent-green); color: #0D1117; }
   .btn-red{ background: var(--accent-red); color: #fff; }
   .btn-ghost{ background: var(--bg-3); color: var(--text); border: 1px solid var(--border); }
   .btn-full{ width: 100%; justify-content: center; }
 
-  /* ── layout ── */
+  /* ── dashboard layout ── */
   .dashboard{ display: none; min-height: 100vh; }
+
+  /* ── sidebar ── */
   .sidebar{
-    position: fixed;
-    top: 0; left: 0;
-    width: 220px;
-    height: 100vh;
-    background: var(--bg-2);
-    border-right: 1px solid var(--border);
-    padding: 24px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    position: fixed; top: 0; left: 0;
+    width: var(--sidebar-w); height: 100vh;
+    background: var(--bg-2); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow-y: auto;
   }
-  .sidebar-logo{ font-weight: 700; font-size: 1rem; padding: 8px 12px; margin-bottom: 16px; }
-  .sidebar-logo span{ color: var(--accent); }
+  .sidebar-profile{
+    padding: 28px 20px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;
+  }
+  .sidebar-avatar{
+    width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+    border: 2px solid var(--accent); background: var(--bg-3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; overflow: hidden;
+  }
+  .sidebar-avatar img{ width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .sidebar-avatar-placeholder{ font-size: 1.8rem; }
+  .sidebar-name{ font-weight: 700; font-size: 0.95rem; }
+  .sidebar-role{ font-size: 0.8rem; color: var(--text-soft); }
+  .sidebar-badge{ font-size: 0.72rem; background: rgba(63,185,80,.15); color: var(--accent-green); border: 1px solid rgba(63,185,80,.3); padding: 2px 10px; border-radius: 20px; font-weight: 600; }
+
+  .sidebar-nav{ padding: 16px 12px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .nav-section-label{ font-size: 0.72rem; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: .08em; padding: 8px 10px 4px; }
   .nav-item{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    border-radius: 8px;
-    font-size: 0.88rem;
-    font-weight: 500;
-    color: var(--text-soft);
-    cursor: pointer;
-    transition: background .15s, color .15s;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px; font-size: 0.88rem; font-weight: 500;
+    color: var(--text-soft); cursor: pointer; transition: background .15s, color .15s;
+    border: none; background: none; width: 100%; text-align: left;
   }
-  .nav-item:hover, .nav-item.active{ background: var(--bg-3); color: var(--text); }
-  .sidebar-bottom{ margin-top: auto; }
-  .main{
-    margin-left: 220px;
-    padding: 36px 40px;
-    max-width: 860px;
+  .nav-item:hover{ background: var(--bg-3); color: var(--text); }
+  .nav-item.active{ background: rgba(88,166,255,.12); color: var(--accent); font-weight: 600; }
+  .nav-item .nav-icon{ font-size: 1rem; width: 20px; text-align: center; }
+
+  .sidebar-bottom{ padding: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px; }
+
+  /* ── main content ── */
+  .main{ margin-left: var(--sidebar-w); min-height: 100vh; display: flex; flex-direction: column; }
+
+  .topbar{
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(13,17,23,.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 36px; display: flex; align-items: center; justify-content: space-between;
   }
+  .topbar-title{ font-weight: 700; font-size: 1rem; }
+  .topbar-actions{ display: flex; gap: 10px; align-items: center; }
+
+  .content{ padding: 32px 36px; flex: 1; max-width: 820px; }
+
   .page{ display: none; }
   .page.active{ display: block; }
-  .page-title{ font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
-  .page-sub{ color: var(--text-soft); font-size: 0.9rem; margin-bottom: 28px; }
+
+  /* ── overview page ── */
+  .welcome-banner{
+    background: linear-gradient(135deg, #1a2744 0%, #1C2333 100%);
+    border: 1px solid rgba(88,166,255,.2);
+    border-radius: 16px; padding: 28px 32px; margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  }
+  .welcome-text h2{ font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+  .welcome-text p{ color: var(--text-soft); font-size: 0.9rem; }
+  .welcome-emoji{ font-size: 3rem; }
+
+  .stats-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card{
+    background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 22px;
+  }
+  .stat-card-label{ font-size: 0.8rem; color: var(--text-soft); font-weight: 500; margin-bottom: 8px; }
+  .stat-card-value{ font-size: 1.8rem; font-weight: 700; }
+  .stat-card-value.blue{ color: var(--accent); }
+  .stat-card-value.green{ color: var(--accent-green); }
+  .stat-card-value.purple{ color: var(--accent-purple); }
+
+  .quick-actions{ background: var(--bg-2); border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+  .quick-actions-title{ font-size: 0.88rem; font-weight: 600; color: var(--text-soft); margin-bottom: 14px; text-transform: uppercase; letter-spacing: .05em; }
+  .quick-actions-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .quick-btn{
+    background: var(--bg-3); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; text-align: center; cursor: pointer;
+    transition: border-color .15s, background .15s; font-size: 0.85rem; font-weight: 500;
+  }
+  .quick-btn:hover{ border-color: var(--accent); background: rgba(88,166,255,.06); color: var(--accent); }
+  .quick-btn-icon{ font-size: 1.4rem; margin-bottom: 6px; }
 
   /* ── cards ── */
-  .card{
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
-  }
-  .card-title{ font-size: 0.95rem; font-weight: 600; margin-bottom: 16px; }
+  .card{ background: var(--bg-2); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+  .card-header{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .card-title{ font-size: 0.95rem; font-weight: 600; }
+  .card-subtitle{ font-size: 0.82rem; color: var(--text-soft); margin-top: 2px; }
 
   /* ── photo upload ── */
   .photo-upload-area{
-    border: 2px dashed var(--border);
-    border-radius: 12px;
-    padding: 32px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color .15s;
+    border: 2px dashed var(--border); border-radius: 14px;
+    padding: 36px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s;
   }
-  .photo-upload-area:hover{ border-color: var(--accent); }
-  .photo-preview{
-    width: 100px; height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--border);
-    margin: 0 auto 12px;
-    display: block;
-  }
+  .photo-upload-area:hover{ border-color: var(--accent); background: rgba(88,166,255,.04); }
+  .photo-preview{ width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); margin: 0 auto 12px; display: block; }
   .photo-preview.hidden{ display: none; }
-  .photo-placeholder{ font-size: 2.5rem; margin-bottom: 8px; }
+  .photo-placeholder-icon{ font-size: 2.5rem; margin-bottom: 8px; }
   .photo-hint{ color: var(--text-soft); font-size: 0.85rem; }
 
   /* ── project list ── */
   .project-item{
-    background: var(--bg-3);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 20px;
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
+    background: var(--bg-3); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    transition: border-color .15s;
   }
+  .project-item:hover{ border-color: rgba(88,166,255,.3); }
   .project-item-title{ font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+  .project-item-desc{ color: var(--text-soft); font-size: 0.83rem; }
   .project-item-tags{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .tag-chip{
-    font-size: 0.75rem;
-    padding: 3px 9px;
-    border-radius: 20px;
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    color: var(--text-soft);
-  }
+  .tag-chip{ font-size: 0.73rem; padding: 3px 9px; border-radius: 20px; background: var(--bg-2); border: 1px solid var(--border); color: var(--text-soft); }
   .project-item-actions{ display: flex; gap: 8px; flex-shrink: 0; }
+
+  /* ── account page ── */
+  .account-header{
+    background: linear-gradient(135deg, #1a2744 0%, #1C2333 100%);
+    border: 1px solid rgba(88,166,255,.2);
+    border-radius: 16px; padding: 28px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .account-avatar{ width: 64px; height: 64px; border-radius: 50%; background: var(--bg-3); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; overflow: hidden; flex-shrink: 0; }
+  .account-avatar img{ width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .account-info h3{ font-size: 1.1rem; font-weight: 700; }
+  .account-info p{ color: var(--text-soft); font-size: 0.85rem; }
 
   /* ── toast ── */
   .toast{
-    position: fixed;
-    bottom: 24px; right: 24px;
-    background: var(--accent-green);
-    color: #0D1117;
-    font-weight: 600;
-    font-size: 0.88rem;
-    padding: 12px 20px;
-    border-radius: 8px;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity .2s, transform .2s;
-    pointer-events: none;
-    z-index: 999;
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--accent-green); color: #0D1117;
+    font-weight: 600; font-size: 0.88rem; padding: 12px 20px;
+    border-radius: 10px; opacity: 0; transform: translateY(10px);
+    transition: opacity .2s, transform .2s; pointer-events: none; z-index: 999;
+    display: flex; align-items: center; gap: 8px;
   }
   .toast.show{ opacity: 1; transform: translateY(0); }
   .toast.error{ background: var(--accent-red); color: #fff; }
 
-  /* ── divider ── */
   .divider{ border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+  .page-header{ margin-bottom: 24px; }
+  .page-header h2{ font-size: 1.3rem; font-weight: 700; }
+  .page-header p{ color: var(--text-soft); font-size: 0.88rem; margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -207,25 +216,23 @@
 <!-- LOGIN / SETUP -->
 <div class="login-screen" id="login-screen">
   <div class="login-box">
+    <div class="login-logo">Benjamin<span>.</span></div>
 
-    <!-- SETUP FORM -->
     <div id="setup-form">
       <h1>Create admin account</h1>
-      <p>You're setting this up for the first time. Choose a username and password.</p>
+      <p>First time setup — choose your username and password.</p>
       <div class="field"><label>Username</label><input type="text" id="setup-username" placeholder="e.g. benjamin"></div>
       <div class="field"><label>Password</label><input type="password" id="setup-password" placeholder="Choose a strong password"></div>
       <button class="btn btn-green btn-full" onclick="setup()">Create account</button>
     </div>
 
-    <!-- LOGIN FORM -->
     <div id="login-form" style="display:none">
-      <h1>Admin login</h1>
+      <h1>Welcome back</h1>
       <p>Sign in to manage your portfolio.</p>
       <div class="field"><label>Username</label><input type="text" id="login-username"></div>
       <div class="field"><label>Password</label><input type="password" id="login-password"></div>
       <button class="btn btn-primary btn-full" onclick="login()">Sign in</button>
     </div>
-
   </div>
 </div>
 
@@ -233,82 +240,209 @@
 <div class="dashboard" id="dashboard">
 
   <aside class="sidebar">
-    <div class="sidebar-logo">Benjamin<span>.</span> Admin</div>
-    <button class="nav-item active" onclick="showPage('profile', this)">👤 Profile</button>
-    <button class="nav-item" onclick="showPage('links', this)">🔗 Links</button>
-    <button class="nav-item" onclick="showPage('projects', this)">📁 Projects</button>
+    <div class="sidebar-profile">
+      <div class="sidebar-avatar" id="sidebar-avatar">
+        <span class="sidebar-avatar-placeholder">👤</span>
+      </div>
+      <div>
+        <div class="sidebar-name" id="sidebar-name">Benjamin Emmanuel</div>
+        <div class="sidebar-role" id="sidebar-role">Data Analyst</div>
+      </div>
+      <div class="sidebar-badge">● Admin</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Menu</div>
+      <button class="nav-item active" id="nav-overview" onclick="showPage('overview', this)">
+        <span class="nav-icon">🏠</span> Overview
+      </button>
+      <button class="nav-item" id="nav-profile" onclick="showPage('profile', this)">
+        <span class="nav-icon">👤</span> Profile
+      </button>
+      <button class="nav-item" id="nav-links" onclick="showPage('links', this)">
+        <span class="nav-icon">🔗</span> Links
+      </button>
+      <button class="nav-item" id="nav-projects" onclick="showPage('projects', this)">
+        <span class="nav-icon">📁</span> Projects
+      </button>
+      <div class="nav-section-label" style="margin-top:8px;">Account</div>
+      <button class="nav-item" id="nav-account" onclick="showPage('account', this)">
+        <span class="nav-icon">⚙️</span> Account
+      </button>
+    </nav>
+
     <div class="sidebar-bottom">
-      <a class="nav-item" href="index.html" target="_blank">↗ View site</a>
-      <button class="nav-item" onclick="logout()">🚪 Logout</button>
+      <a class="nav-item" href="index.html" target="_blank">
+        <span class="nav-icon">↗</span> View live site
+      </a>
+      <button class="nav-item" onclick="logout()">
+        <span class="nav-icon">🚪</span> Logout
+      </button>
     </div>
   </aside>
 
-  <main class="main">
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Overview</div>
+      <div class="topbar-actions">
+        <a class="btn btn-ghost" href="index.html" target="_blank" style="font-size:0.82rem;padding:7px 14px;">↗ View site</a>
+      </div>
+    </div>
 
-    <!-- PROFILE PAGE -->
-    <div class="page active" id="page-profile">
-      <div class="page-title">Profile</div>
-      <div class="page-sub">Update your name, bio, and photo.</div>
+    <div class="content">
 
-      <div class="card">
-        <div class="card-title">Profile photo</div>
-        <div class="photo-upload-area" onclick="document.getElementById('photo-input').click()">
-          <img id="photo-preview" class="photo-preview hidden" src="" alt="Profile photo">
-          <div id="photo-placeholder">
-            <div class="photo-placeholder">📷</div>
-            <div class="photo-hint">Click to upload a photo (max 5MB)</div>
+      <!-- OVERVIEW PAGE -->
+      <div class="page active" id="page-overview">
+        <div class="welcome-banner">
+          <div class="welcome-text">
+            <h2>Welcome back, <span id="welcome-name">Benjamin</span> 👋</h2>
+            <p>Here's a quick look at your portfolio.</p>
+          </div>
+          <div class="welcome-emoji">📊</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-label">Projects</div>
+            <div class="stat-card-value blue" id="stat-projects">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Contact links</div>
+            <div class="stat-card-value green" id="stat-links">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Profile</div>
+            <div class="stat-card-value purple" id="stat-profile">—</div>
           </div>
         </div>
-        <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
-      </div>
 
-      <div class="card">
-        <div class="card-title">Profile details</div>
-        <div class="field"><label>Full name</label><input type="text" id="profile-name"></div>
-        <div class="field"><label>Title</label><input type="text" id="profile-title"></div>
-        <div class="field"><label>Bio</label><textarea id="profile-bio"></textarea></div>
-        <button class="btn btn-primary" onclick="saveProfile()">Save profile</button>
-      </div>
-    </div>
-
-    <!-- LINKS PAGE -->
-    <div class="page" id="page-links">
-      <div class="page-title">Links</div>
-      <div class="page-sub">Update your contact and social links.</div>
-      <div class="card">
-        <div class="field"><label>Email address</label><input type="email" id="link-email"></div>
-        <div class="field"><label>WhatsApp number (with country code, e.g. 2348012345678)</label><input type="text" id="link-whatsapp"></div>
-        <div class="field"><label>GitHub username</label><input type="text" id="link-github"></div>
-        <div class="field"><label>LinkedIn username</label><input type="text" id="link-linkedin"></div>
-        <button class="btn btn-primary" onclick="saveLinks()">Save links</button>
-      </div>
-    </div>
-
-    <!-- PROJECTS PAGE -->
-    <div class="page" id="page-projects">
-      <div class="page-title">Projects</div>
-      <div class="page-sub">Add, edit, or remove your projects.</div>
-
-      <div id="projects-list"></div>
-
-      <hr class="divider">
-
-      <div class="card">
-        <div class="card-title" id="project-form-title">Add new project</div>
-        <input type="hidden" id="edit-project-id">
-        <div class="field"><label>Title</label><input type="text" id="proj-title"></div>
-        <div class="field"><label>Description</label><textarea id="proj-desc"></textarea></div>
-        <div class="field"><label>Tags (comma separated, e.g. SQL, Excel)</label><input type="text" id="proj-tags"></div>
-        <div class="field"><label>Report URL</label><input type="text" id="proj-report"></div>
-        <div class="field"><label>SQL file URL</label><input type="text" id="proj-sql"></div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="btn btn-green" onclick="saveProject()">Save project</button>
-          <button class="btn btn-ghost" onclick="clearProjectForm()">Clear</button>
+        <div class="quick-actions">
+          <div class="quick-actions-title">Quick actions</div>
+          <div class="quick-actions-grid">
+            <div class="quick-btn" onclick="showPage('profile', document.getElementById('nav-profile'))">
+              <div class="quick-btn-icon">👤</div>Edit profile
+            </div>
+            <div class="quick-btn" onclick="showPage('projects', document.getElementById('nav-projects'))">
+              <div class="quick-btn-icon">➕</div>Add project
+            </div>
+            <div class="quick-btn" onclick="showPage('links', document.getElementById('nav-links'))">
+              <div class="quick-btn-icon">🔗</div>Update links
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-  </main>
+      <!-- PROFILE PAGE -->
+      <div class="page" id="page-profile">
+        <div class="page-header">
+          <h2>Profile</h2>
+          <p>Update your name, bio, and photo.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Profile photo</div>
+              <div class="card-subtitle">Shown on your portfolio homepage</div>
+            </div>
+          </div>
+          <div class="photo-upload-area" onclick="document.getElementById('photo-input').click()">
+            <img id="photo-preview" class="photo-preview hidden" src="" alt="Profile photo">
+            <div id="photo-placeholder">
+              <div class="photo-placeholder-icon">📷</div>
+              <div class="photo-hint">Click to upload a photo (max 5MB)</div>
+            </div>
+          </div>
+          <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Profile details</div>
+          </div>
+          <div class="field"><label>Full name</label><input type="text" id="profile-name"></div>
+          <div class="field"><label>Title</label><input type="text" id="profile-title"></div>
+          <div class="field"><label>Bio</label><textarea id="profile-bio"></textarea></div>
+          <button class="btn btn-primary" onclick="saveProfile()">Save profile</button>
+        </div>
+      </div>
+
+      <!-- LINKS PAGE -->
+      <div class="page" id="page-links">
+        <div class="page-header">
+          <h2>Links</h2>
+          <p>Update your contact and social links.</p>
+        </div>
+        <div class="card">
+          <div class="field"><label>Email address</label><input type="email" id="link-email"></div>
+          <div class="field"><label>WhatsApp (with country code, e.g. 2348012345678)</label><input type="text" id="link-whatsapp"></div>
+          <div class="field"><label>GitHub username</label><input type="text" id="link-github"></div>
+          <div class="field"><label>LinkedIn username</label><input type="text" id="link-linkedin"></div>
+          <button class="btn btn-primary" onclick="saveLinks()">Save links</button>
+        </div>
+      </div>
+
+      <!-- PROJECTS PAGE -->
+      <div class="page" id="page-projects">
+        <div class="page-header">
+          <h2>Projects</h2>
+          <p>Add, edit, or remove your projects.</p>
+        </div>
+
+        <div id="projects-list"></div>
+
+        <hr class="divider">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" id="project-form-title">Add new project</div>
+          </div>
+          <input type="hidden" id="edit-project-id">
+          <div class="field"><label>Title</label><input type="text" id="proj-title"></div>
+          <div class="field"><label>Description</label><textarea id="proj-desc"></textarea></div>
+          <div class="field"><label>Tags (comma separated)</label><input type="text" id="proj-tags"></div>
+          <div class="field"><label>Report URL</label><input type="text" id="proj-report"></div>
+          <div class="field"><label>SQL file URL</label><input type="text" id="proj-sql"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-green" onclick="saveProject()">Save project</button>
+            <button class="btn btn-ghost" onclick="clearProjectForm()">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCOUNT PAGE -->
+      <div class="page" id="page-account">
+        <div class="page-header">
+          <h2>Account</h2>
+          <p>Manage your admin credentials.</p>
+        </div>
+
+        <div class="account-header">
+          <div class="account-avatar" id="account-avatar">
+            <span>👤</span>
+          </div>
+          <div class="account-info">
+            <h3 id="account-name">Benjamin Emmanuel</h3>
+            <p>Administrator · Portfolio manager</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Change password</div>
+              <div class="card-subtitle">You'll be logged out after changing your password</div>
+            </div>
+          </div>
+          <div class="field"><label>Current password</label><input type="password" id="current-password"></div>
+          <div class="field"><label>New password</label><input type="password" id="new-password"></div>
+          <div class="field"><label>Confirm new password</label><input type="password" id="confirm-password"></div>
+          <button class="btn btn-primary" onclick="changePassword()">Update password</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -317,11 +451,7 @@
   const API = 'https://portfolio-backend-3smd.onrender.com';
   let token = localStorage.getItem('admin_token');
 
-  if (token) {
-    showDashboard();
-  } else {
-    checkAuthStatus();
-  }
+  if (token) { showDashboard(); } else { checkAuthStatus(); }
 
   async function checkAuthStatus() {
     try {
@@ -331,9 +461,7 @@
         document.getElementById('setup-form').style.display = 'none';
         document.getElementById('login-form').style.display = 'block';
       }
-    } catch {
-      showToast('Cannot connect to server. Is it running?', true);
-    }
+    } catch { showToast('Cannot connect to server', true); }
   }
 
   async function setup() {
@@ -342,8 +470,7 @@
     if (!username || !password) return showToast('Both fields are required', true);
     try {
       const res = await fetch(`${API}/setup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
@@ -351,9 +478,7 @@
       token = data.token;
       localStorage.setItem('admin_token', token);
       showDashboard();
-    } catch {
-      showToast('Cannot connect to server', true);
-    }
+    } catch { showToast('Cannot connect to server', true); }
   }
 
   async function login() {
@@ -361,8 +486,7 @@
     const password = document.getElementById('login-password').value;
     try {
       const res = await fetch(`${API}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
@@ -370,9 +494,7 @@
       token = data.token;
       localStorage.setItem('admin_token', token);
       showDashboard();
-    } catch {
-      showToast('Cannot connect to server', true);
-    }
+    } catch { showToast('Cannot connect to server', true); }
   }
 
   function logout() {
@@ -395,8 +517,25 @@
       fillProfile(data.profile);
       fillLinks(data.links);
       fillProjects(data.projects);
-    } catch {
-      showToast('Could not load data', true);
+      fillOverview(data.profile, data.links, data.projects);
+    } catch { showToast('Could not load data', true); }
+  }
+
+  function fillOverview(profile, links, projects) {
+    document.getElementById('welcome-name').textContent = (profile.name || 'Benjamin').split(' ')[0];
+    document.getElementById('stat-projects').textContent = projects.length;
+    const filledLinks = Object.values(links).filter(v => v && v !== 'yourusername').length;
+    document.getElementById('stat-links').textContent = filledLinks + '/4';
+    document.getElementById('stat-profile').textContent = profile.bio ? '✓' : '—';
+    document.getElementById('sidebar-name').textContent = profile.name || 'Benjamin Emmanuel';
+    document.getElementById('sidebar-role').textContent = profile.title || 'Data Analyst';
+    document.getElementById('account-name').textContent = profile.name || 'Benjamin Emmanuel';
+    if (profile.photo) {
+      const src = API + profile.photo;
+      const sidebarAvatar = document.getElementById('sidebar-avatar');
+      sidebarAvatar.innerHTML = `<img src="${src}" alt="avatar">`;
+      const accountAvatar = document.getElementById('account-avatar');
+      accountAvatar.innerHTML = `<img src="${src}" alt="avatar">`;
     }
   }
 
@@ -429,7 +568,7 @@
       <div class="project-item">
         <div>
           <div class="project-item-title">${p.title}</div>
-          <div style="color:var(--text-soft);font-size:0.85rem;">${p.description.slice(0, 80)}...</div>
+          <div class="project-item-desc">${p.description.slice(0, 90)}...</div>
           <div class="project-item-tags">${p.tags.map(t => `<span class="tag-chip">${t}</span>`).join('')}</div>
         </div>
         <div class="project-item-actions">
@@ -447,7 +586,7 @@
       bio: document.getElementById('profile-bio').value,
     };
     const res = await authFetch('/profile', 'PUT', body);
-    if (res) showToast('Profile saved');
+    if (res) { showToast('Profile saved ✓'); await loadData(); }
   }
 
   async function uploadPhoto(input) {
@@ -457,9 +596,7 @@
     form.append('photo', file);
     try {
       const res = await fetch(`${API}/photo`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
+        method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: form,
       });
       const data = await res.json();
       if (!res.ok) return showToast(data.error, true);
@@ -467,10 +604,9 @@
       img.src = API + data.photo + '?t=' + Date.now();
       img.classList.remove('hidden');
       document.getElementById('photo-placeholder').style.display = 'none';
-      showToast('Photo uploaded');
-    } catch {
-      showToast('Upload failed', true);
-    }
+      showToast('Photo uploaded ✓');
+      await loadData();
+    } catch { showToast('Upload failed', true); }
   }
 
   async function saveLinks() {
@@ -481,7 +617,7 @@
       linkedin: document.getElementById('link-linkedin').value,
     };
     const res = await authFetch('/links', 'PUT', body);
-    if (res) showToast('Links saved');
+    if (res) { showToast('Links saved ✓'); await loadData(); }
   }
 
   async function saveProject() {
@@ -494,14 +630,8 @@
       sqlUrl: document.getElementById('proj-sql').value,
     };
     if (!body.title) return showToast('Title is required', true);
-    const res = id
-      ? await authFetch(`/projects/${id}`, 'PUT', body)
-      : await authFetch('/projects', 'POST', body);
-    if (res) {
-      showToast(id ? 'Project updated' : 'Project added');
-      clearProjectForm();
-      await loadData();
-    }
+    const res = id ? await authFetch(`/projects/${id}`, 'PUT', body) : await authFetch('/projects', 'POST', body);
+    if (res) { showToast(id ? 'Project updated ✓' : 'Project added ✓'); clearProjectForm(); await loadData(); }
   }
 
   function editProject(p) {
@@ -512,7 +642,6 @@
     document.getElementById('proj-report').value = p.reportUrl || '';
     document.getElementById('proj-sql').value = p.sqlUrl || '';
     document.getElementById('project-form-title').textContent = 'Edit project';
-    document.getElementById('page-projects').scrollTo({ top: 99999, behavior: 'smooth' });
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   }
 
@@ -528,6 +657,16 @@
     document.getElementById('project-form-title').textContent = 'Add new project';
   }
 
+  async function changePassword() {
+    const current = document.getElementById('current-password').value;
+    const newPass = document.getElementById('new-password').value;
+    const confirm = document.getElementById('confirm-password').value;
+    if (!current || !newPass) return showToast('All fields are required', true);
+    if (newPass !== confirm) return showToast('Passwords do not match', true);
+    const res = await authFetch('/change-password', 'POST', { currentPassword: current, newPassword: newPass });
+    if (res) { showToast('Password updated — please log in again'); setTimeout(logout, 2000); }
+  }
+
   async function authFetch(path, method, body) {
     try {
       const res = await fetch(`${API}${path}`, {
@@ -538,17 +677,17 @@
       const data = await res.json();
       if (!res.ok) { showToast(data.error || 'Something went wrong', true); return null; }
       return data;
-    } catch {
-      showToast('Cannot connect to server', true);
-      return null;
-    }
+    } catch { showToast('Cannot connect to server', true); return null; }
   }
+
+  const pageTitles = { overview: 'Overview', profile: 'Profile', links: 'Links', projects: 'Projects', account: 'Account' };
 
   function showPage(name, btn) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById(`page-${name}`).classList.add('active');
     btn.classList.add('active');
+    document.getElementById('topbar-title').textContent = pageTitles[name];
   }
 
   function showToast(msg, isError = false) {
@@ -565,6 +704,5 @@
     else setup();
   });
 </script>
-
 </body>
 </html>
