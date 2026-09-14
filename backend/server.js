@@ -17,8 +17,15 @@ app.use(express.json());
 app.use('/uploads', express.static(UPLOADS_DIR));
 
 // ── helpers ──
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
 if (!fs.existsSync(DATA_FILE)) {
-  fs.copyFileSync(path.join(__dirname, 'data.example.json'), DATA_FILE);
+  fs.writeFileSync(DATA_FILE, JSON.stringify({
+    admin: null,
+    profile: { name: 'Benjamin Emmanuel', title: 'Data Analyst', bio: '', photo: '' },
+    links: { email: '', whatsapp: '', github: '', linkedin: '' },
+    projects: []
+  }, null, 2));
 }
 const readData = () => JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
 const writeData = (data) => fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
