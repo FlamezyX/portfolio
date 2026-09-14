@@ -4,42 +4,59 @@ const cors = require('cors');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const DATA_FILE = path.join(__dirname, 'data.json');
+const SECRET = 'portfolio_jwt_secret_2026';
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(UPLOADS_DIR));
 
-// ── helpers ──
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-if (!fs.existsSync(DATA_FILE)) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify({
-    admin: null,
-    profile: { name: 'Benjamin Emmanuel', title: 'Data Analyst', bio: '', photo: '' },
-    links: { email: '', whatsapp: '', github: '', linkedin: '' },
-    projects: []
-  }, null, 2));
-}
-const readData = () => JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
-const writeData = (data) => fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+// ── MongoDB connection ──
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => { console.error('MongoDB connection error:', err); process.exit(1); });
 
-// Seed admin from env vars if admin is null (survives redeployments)
-{
-  const d = readData();
-  if (!d.admin && process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD_HASH) {
-    d.admin = { username: process.env.ADMIN_USERNAME, password: process.env.ADMIN_PASSWORD_HASH };
-    writeData(d);
-  }
+// ── Schemas ──
+const adminSchema = new mongoose.Schema({
+  username: String,
+  password: String,
+});
+
+const portfolioSchema = new mongoose.Schema({
+  profile: {
+    name: { type: String, default: 'Benjamin Emmanuel' },
+    title: { type: String, default: 'Data Analyst' },
+    bio: { type: String, default: '' },
+    photo: { type: String, default: '' },
+  },
+  links: {
+    email: { type: String, default: '' },
+    whatsapp: { type: String, default: '' },
+    github: { type: String, default: '' },
+    linkedin: { type: String, default: '' },
+  },
+  projects: { type: Array, default: [] },
+});
+
+const Admin = mongoose.model('Admin', adminSchema);
+const Portfolio = mongoose.model('Portfolio', portfolioSchema);
+
+// ── get or create the single portfolio document ──
+async function getPortfolio() {
+  let doc = await Portfolio.findOne();
+  if (!doc) { doc = await Portfolio.create({}); }
+  return doc;
 }
 
-// ── multer (photo upload) ──
+// ── multer ──
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOADS_DIR),
   filename: (req, file, cb) => cb(null, 'photo' + path.extname(file.originalname)),
@@ -65,106 +82,99 @@ const auth = (req, res, next) => {
   }
 };
 
-const SECRET = 'portfolio_jwt_secret_2026';
-
 // ── routes ──
 
-// GET /auth-status — check if admin account exists
-app.get('/auth-status', (req, res) => {
-  const data = readData();
-  res.json({ hasAdmin: !!data.admin });
+app.get('/auth-status', async (req, res) => {
+  const admin = await Admin.findOne();
+  res.json({ hasAdmin: !!admin });
 });
 
-// POST /setup — create admin account (only works if no admin exists yet)
 app.post('/setup', async (req, res) => {
-  const data = readData();
-  if (data.admin) return res.status(400).json({ error: 'Admin already exists' });
+  const existing = await Admin.findOne();
+  if (existing) return res.status(400).json({ error: 'Admin already exists' });
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
   const hash = await bcrypt.hash(password, 10);
-  data.admin = { username, password: hash };
-  writeData(data);
+  await Admin.create({ username, password: hash });
   const token = jwt.sign({ username }, SECRET, { expiresIn: '8h' });
   res.json({ token });
 });
 
-// POST /login
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const data = readData();
-  if (!data.admin) return res.status(400).json({ error: 'No admin account found. Please set up first.' });
-  if (username !== data.admin.username) return res.status(401).json({ error: 'Invalid credentials' });
-  const valid = await bcrypt.compare(password, data.admin.password);
+  const admin = await Admin.findOne();
+  if (!admin) return res.status(400).json({ error: 'No admin account found. Please set up first.' });
+  if (username !== admin.username) return res.status(401).json({ error: 'Invalid credentials' });
+  const valid = await bcrypt.compare(password, admin.password);
   if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
   const token = jwt.sign({ username }, SECRET, { expiresIn: '8h' });
   res.json({ token });
 });
 
-// GET /data — public, used by the portfolio frontend
-app.get('/data', (req, res) => {
-  res.json(readData());
+app.get('/data', async (req, res) => {
+  const doc = await getPortfolio();
+  res.json({ profile: doc.profile, links: doc.links, projects: doc.projects });
 });
 
-// PUT /profile — update name, title, bio
-app.put('/profile', auth, (req, res) => {
-  const data = readData();
-  data.profile = { ...data.profile, ...req.body };
-  writeData(data);
-  res.json(data.profile);
+app.put('/profile', auth, async (req, res) => {
+  const doc = await getPortfolio();
+  Object.assign(doc.profile, req.body);
+  doc.markModified('profile');
+  await doc.save();
+  res.json(doc.profile);
 });
 
-// POST /photo — upload profile photo
-app.post('/photo', auth, upload.single('photo'), (req, res) => {
+app.post('/photo', auth, upload.single('photo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-  const data = readData();
-  data.profile.photo = `/uploads/${req.file.filename}`;
-  writeData(data);
-  res.json({ photo: data.profile.photo });
+  const doc = await getPortfolio();
+  doc.profile.photo = `/uploads/${req.file.filename}`;
+  doc.markModified('profile');
+  await doc.save();
+  res.json({ photo: doc.profile.photo });
 });
 
-// PUT /links — update social links
-app.put('/links', auth, (req, res) => {
-  const data = readData();
-  data.links = { ...data.links, ...req.body };
-  writeData(data);
-  res.json(data.links);
+app.put('/links', auth, async (req, res) => {
+  const doc = await getPortfolio();
+  Object.assign(doc.links, req.body);
+  doc.markModified('links');
+  await doc.save();
+  res.json(doc.links);
 });
 
-// POST /projects — add a new project
-app.post('/projects', auth, (req, res) => {
-  const data = readData();
+app.post('/projects', auth, async (req, res) => {
+  const doc = await getPortfolio();
   const project = { id: Date.now().toString(), ...req.body };
-  data.projects.push(project);
-  writeData(data);
+  doc.projects.push(project);
+  doc.markModified('projects');
+  await doc.save();
   res.status(201).json(project);
 });
 
-// PUT /projects/:id — update a project
-app.put('/projects/:id', auth, (req, res) => {
-  const data = readData();
-  const index = data.projects.findIndex(p => p.id === req.params.id);
+app.put('/projects/:id', auth, async (req, res) => {
+  const doc = await getPortfolio();
+  const index = doc.projects.findIndex(p => p.id === req.params.id);
   if (index === -1) return res.status(404).json({ error: 'Project not found' });
-  data.projects[index] = { ...data.projects[index], ...req.body };
-  writeData(data);
-  res.json(data.projects[index]);
+  doc.projects[index] = { ...doc.projects[index], ...req.body };
+  doc.markModified('projects');
+  await doc.save();
+  res.json(doc.projects[index]);
 });
 
-// POST /change-password
-app.post('/change-password', auth, async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-  const data = readData();
-  const valid = await bcrypt.compare(currentPassword, data.admin.password);
-  if (!valid) return res.status(401).json({ error: 'Current password is incorrect' });
-  data.admin.password = await bcrypt.hash(newPassword, 10);
-  writeData(data);
+app.delete('/projects/:id', auth, async (req, res) => {
+  const doc = await getPortfolio();
+  doc.projects = doc.projects.filter(p => p.id !== req.params.id);
+  doc.markModified('projects');
+  await doc.save();
   res.json({ success: true });
 });
 
-// DELETE /projects/:id — remove a project
-app.delete('/projects/:id', auth, (req, res) => {
-  const data = readData();
-  data.projects = data.projects.filter(p => p.id !== req.params.id);
-  writeData(data);
+app.post('/change-password', auth, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const admin = await Admin.findOne();
+  const valid = await bcrypt.compare(currentPassword, admin.password);
+  if (!valid) return res.status(401).json({ error: 'Current password is incorrect' });
+  admin.password = await bcrypt.hash(newPassword, 10);
+  await admin.save();
   res.json({ success: true });
 });
 
