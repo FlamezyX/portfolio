@@ -17,6 +17,9 @@ app.use(express.json());
 app.use('/uploads', express.static(UPLOADS_DIR));
 
 // ── helpers ──
+if (!fs.existsSync(DATA_FILE)) {
+  fs.copyFileSync(path.join(__dirname, 'data.example.json'), DATA_FILE);
+}
 const readData = () => JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
 const writeData = (data) => fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 
