@@ -17,7 +17,7 @@ function renderProfile({ bio, photo, name }) {
   document.title = `${name} — Data Analyst`;
   if (photo) {
     const img = document.getElementById('profile-photo');
-    img.src = API + photo;
+    img.src = photo;
     img.classList.remove('hidden');
   }
 }

@@ -5,19 +5,21 @@ const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const fs = require('fs');
-const path = require('path');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const SECRET = 'portfolio_jwt_secret_2026';
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static(UPLOADS_DIR));
 
-if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // ── MongoDB connection ──
 mongoose.connect(process.env.MONGO_URI)
@@ -56,19 +58,12 @@ async function getPortfolio() {
   return doc;
 }
 
-// ── multer ──
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOADS_DIR),
-  filename: (req, file, cb) => cb(null, 'photo' + path.extname(file.originalname)),
+// ── multer + cloudinary ──
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: { folder: 'portfolio', allowed_formats: ['jpg', 'jpeg', 'png', 'webp'], public_id: () => 'profile-photo' },
 });
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true);
-    else cb(new Error('Only image files are allowed'));
-  },
-});
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 // ── auth middleware ──
 const auth = (req, res, next) => {
@@ -127,7 +122,7 @@ app.put('/profile', auth, async (req, res) => {
 app.post('/photo', auth, upload.single('photo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
   const doc = await getPortfolio();
-  doc.profile.photo = `/uploads/${req.file.filename}`;
+  doc.profile.photo = req.file.path;
   doc.markModified('profile');
   await doc.save();
   res.json({ photo: doc.profile.photo });

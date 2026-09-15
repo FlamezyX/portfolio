@@ -13,6 +13,8 @@
   "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.0.0",
+    "multer-storage-cloudinary": "^4.0.0",
     "mongoose": "^8.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",

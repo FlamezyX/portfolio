@@ -81,7 +81,7 @@ function fillOverview(profile, links, projects) {
   document.getElementById('sidebar-role').textContent = profile.title || 'Data Analyst';
   document.getElementById('account-name').textContent = profile.name || 'Benjamin Emmanuel';
   if (profile.photo) {
-    const src = API + profile.photo;
+    const src = profile.photo;
     document.getElementById('sidebar-avatar').innerHTML = `<img src="${src}" alt="avatar">`;
     document.getElementById('account-avatar').innerHTML = `<img src="${src}" alt="avatar">`;
   }
@@ -93,7 +93,7 @@ function fillProfile({ name, title, bio, photo }) {
   document.getElementById('profile-bio').value = bio || '';
   if (photo) {
     const img = document.getElementById('photo-preview');
-    img.src = API + photo;
+    img.src = photo;
     img.classList.remove('hidden');
     document.getElementById('photo-placeholder').style.display = 'none';
   }
@@ -149,7 +149,7 @@ async function uploadPhoto(input) {
     const data = await res.json();
     if (!res.ok) return showToast(data.error, true);
     const img = document.getElementById('photo-preview');
-    img.src = API + data.photo + '?t=' + Date.now();
+    img.src = data.photo + '?t=' + Date.now();
     img.classList.remove('hidden');
     document.getElementById('photo-placeholder').style.display = 'none';
     showToast('Photo uploaded ✓');
